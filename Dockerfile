@@ -18,4 +18,4 @@ ENV NODE_ENV=production
 EXPOSE 9000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["npx", "medusa", "start"]
+CMD ["sh", "-c", "npx medusa db:migrate && npx medusa start"]
