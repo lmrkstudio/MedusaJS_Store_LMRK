@@ -1,8 +1,9 @@
 node_modules
-.medusa
 .git
 .env
 *.log
 dist
 .agents
 .claude
+CLAUDE.md
+src

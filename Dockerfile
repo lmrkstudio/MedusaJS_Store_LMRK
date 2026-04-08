@@ -2,27 +2,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# System dependencies needed for native modules
-RUN apk add --no-cache python3 make g++ dumb-init curl
+RUN apk add --no-cache dumb-init curl
 
-# Copy package files
-COPY package*.json ./
+# Copy pre-built server output (medusa-config.js + package files)
+COPY .medusa/server/ ./
 
-# Install all dependencies
-RUN npm install --legacy-peer-deps
+# Copy pre-built admin dashboard (must stay at .medusa/client/)
+COPY .medusa/client/ ./.medusa/client/
 
-# Explicitly install build tools (needed for medusa build step)
-RUN npm install --save-dev ts-node typescript @swc/core @swc/jest --legacy-peer-deps
-
-# Copy source files
-COPY . .
-
-# Build Medusa (requires dummy env vars at build time)
-RUN touch .env && \
-    NODE_ENV=development \
-    DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy?sslmode=disable \
-    REDIS_URL=redis://localhost:6379 \
-    npx medusa build
+# Install production dependencies
+RUN NODE_ENV=production npm install --legacy-peer-deps && npm cache clean --force
 
 ENV NODE_ENV=production
 
